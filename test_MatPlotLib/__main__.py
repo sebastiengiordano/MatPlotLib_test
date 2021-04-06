@@ -2,8 +2,8 @@ import matplotlib.pyplot as plt
 import matplotlib.colors as mcolors
 import pandas as pd
 from time import sleep
-import display
-import utils
+from test_MatPlotLib import display
+from test_MatPlotLib import utils
 
 
 def test_pyplot():
@@ -38,15 +38,15 @@ def test_pyplot():
 def main():
     # test_pyplot()
     # df = utils.csv_to_DataFrame()
-    df = utils.csv_to_DataFrame('C:\\Projets\\CNA\\test_MatPlotLib\\animation\\11_courbes.txt')
+    df = utils.csv_to_DataFrame('C:\\Projets\\CNA\\MatPlotLib_test\\test_MatPlotLib\\animation\\11_courbes.txt')
     df = df[:][1:].astype(float)
     
     graph = display.Display()
-    graph.add(df.iloc[0])
+    graph.add_data(df.iloc[0])
     graph.display()
 
     for line in range(1, df.shape[0]):
-        graph.add(df.iloc[line])
+        graph.add_data(df.iloc[line])
         graph.display()
         # sleep(.05)
     print(df)
