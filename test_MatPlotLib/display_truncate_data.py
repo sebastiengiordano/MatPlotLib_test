@@ -11,6 +11,7 @@ class Display():
         plt.ion()
 
         self.df = pd.DataFrame()
+        self.labels = ""
         self.y_min = int_max_value
         self.y_max = - int_max_value
 
@@ -21,15 +22,19 @@ class Display():
         self.ax.xaxis.set_major_locator(plt.MaxNLocator(6))
         self.ax.yaxis.set_major_locator(plt.MaxNLocator(10))
 
-        self.limit_data = 1000
+        self.limit_data = 500
         self.range_min = 0
         self.range_max = 0
         self.time = time.time()
+        self.df_size = 0
 
         self.color_choice = []
 
     def set_labels(self, labels):
-        self.df = pd.DataFrame(columns=labels)
+        # print('\nlabels: ', labels)
+        # self.df = pd.DataFrame(columns=labels)
+        # print('\ndf: ', self.df)
+        self.labels = labels
         self.df_size = len(self.df.columns)
         self._assign_color_init(self.df_size)
         self.visible = [True] * self.df_size
@@ -37,7 +42,12 @@ class Display():
 
     def add_data(self, data):
         if (len(data) == self.df_size) or (self.df_size == 0):
-            self.df = self.df.append([data.values])
+            self.df = self.df.append([data.values], ignore_index=True)
+
+        # Limitation of amount of data saved
+        len_data = self.df.count()[0]
+        if len_data > self.limit_data * 2:
+            self.df = self.df[self.limit_data:]
         self.set_boundary()
 
     def display(self):
@@ -78,9 +88,17 @@ class Display():
     def update_draw(self):
         r_min = self.range_min
         r_max = self.range_max
+        # x_label = self.df.columns[0]
+        # print('\nx_label: ', x_label)
+        # print('type(x_label): ', type(x_label))
+        # print('df.columns: ', self.df.columns)
+        # print('df: ', self.df)
+        print('self.range_max: ', self.range_max, '\ttype(self.range_max): ', type(self.range_max))
+        x_min = self.df[0].loc[0]
+        x_max = self.df[0].loc[self.range_max]
         self.ax.clear()
         self.ax.ignore_existing_data_limits = True
-        self.ax.update_datalim(((r_min, self.y_min),(r_max, self.y_max)))
+        self.ax.update_datalim(((x_min, self.y_min),(x_max, self.y_max)))
         self.ax.autoscale_view()
         # self.ax.set_xlim((r_min, r_max))
         # self.ax.set_ylim((self.y_min, self.y_max))
@@ -96,10 +114,9 @@ class Display():
 
     def _add_check_box(self):
         CheckButton = plt.axes([0.01, 0.01, 0.1, 0.9])
-        self.chxbox = CheckButtons(CheckButton, list(self.df.columns)[1:], self.visible)    
-
+        # CheckButton = plt.axes([0.05, 0.4, 0.1, 0.15])
+        self.chxbox = CheckButtons(CheckButton, self.labels[1:], self.visible)
         [rec.set_facecolor(self.color_choice[i+1]) for i, rec in enumerate(self.chxbox.rectangles)] 
-        # [ll.set_linewidth(10) for l in self.chxbox.lines for ll in l]
         self.chxbox.on_clicked(self._set_visible)
 
     def _set_visible(self, label):
@@ -115,13 +132,12 @@ class Display():
             else:
                 key = list(mcolors.BASE_COLORS)[index - size_tableau_colors]
                 self.color_choice.append(mcolors.BASE_COLORS[key])
-        print(self.color_choice)
 
 
 if __name__ == '__main__':
     import utils
     from time import sleep
-    df = utils.csv_to_DataFrame('C:\\Projets\\CNA\\MatPlotLib_test\\test_MatPlotLib\\animation\\6_courbes-small.txt')
+    df = utils.csv_to_DataFrame('C:\\Projets\\CNA\\MatPlotLib_test\\test_MatPlotLib\\animation\\6_courbes.txt')
     df_labels = list(df.iloc[0])
     df = df[1:].astype(float)
     

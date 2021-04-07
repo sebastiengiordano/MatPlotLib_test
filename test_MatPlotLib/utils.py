@@ -3,6 +3,7 @@ import pandas as pd
 
 
 def csv_to_DataFrame(file_path=None, delimiter=','):
+# def csv_to_DataFrame(file_path=None, delimiter=r'\s*,\s*'):
     if not file_path:
         fileDir = os.path.dirname(os.path.realpath('__file__'))
         file_path = os.path.join(fileDir, "../test_wxPython/models/Log.csv")
