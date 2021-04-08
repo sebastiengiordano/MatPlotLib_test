@@ -37,3 +37,8 @@
         DATA_TO_REMOVED = STORED_DATA_LIMIT - DISPLAY_DATA_LIMIT * 3
     Durée ajout data: 87.71 s
     Temps affichage: 0.16 s
+
+
+    concat method + new_DataFrame:
+        Durée ajout data: 88.41 s
+        Temps affichage: 0.16 s
