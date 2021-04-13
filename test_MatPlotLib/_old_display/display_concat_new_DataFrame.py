@@ -44,7 +44,6 @@ class Display():
 
     def add_data(self, data):
         self.df = pd.concat([self.df, pd.DataFrame([data.values])], ignore_index=True)
-        self.set_boundary()
         index_min = self.df.index[0]
         index_max = self.range_max
         if self.range_max - index_min > STORED_DATA_LIMIT:
@@ -74,19 +73,20 @@ class Display():
 
         # y-axis range research
         for index in range(1, self.df_size):
-            y_max = self.df[index][r_min:r_max].max()
-            y_min = self.df[index][r_min:r_max].min()
-            if y_max > self.y_max:
-                self.y_max = y_max
-            if y_min < self.y_min:
-                self.y_min = y_min
+            if self.visible[index]:
+                y_max = self.df[index][r_min:r_max].max()
+                y_min = self.df[index][r_min:r_max].min()
+                if y_max > self.y_max:
+                    self.y_max = y_max
+                if y_min < self.y_min:
+                    self.y_min = y_min
 
     def update_draw(self):
+        self.set_boundary()
         r_min = self.range_min
         r_max = self.range_max
-        print(r_min, r_max,"\n",self.df)
         self.ax.clear()
-        self.ax.ignore_existing_data_limits = True
+        # self.ax.ignore_existing_data_limits = True
         self.ax.update_datalim(((self.df[0][r_min], self.y_min),(self.df[0][r_max], self.y_max)))
         self.ax.autoscale_view()
         # self.ax.set_xlim((r_min, r_max))
@@ -103,9 +103,10 @@ class Display():
 
     def _add_check_box(self):
         CheckButton = plt.axes([0.01, 0.01, 0.1, 0.9])
-        self.chxbox = CheckButtons(CheckButton, self.labels[1:], self.visible)    
+        self.chxbox = CheckButtons(CheckButton, self.labels[1:], self.visible)
 
         [rec.set_facecolor(self.color_choice[i+1]) for i, rec in enumerate(self.chxbox.rectangles)] 
+        [rec.set_width(0.8) for rec in self.chxbox.rectangles]                                                       
         # [ll.set_linewidth(10) for l in self.chxbox.lines for ll in l]
         self.chxbox.on_clicked(self._set_visible)
 
@@ -128,7 +129,7 @@ if __name__ == '__main__':
     import utils
     from time import sleep
     import time
-    df = utils.csv_to_DataFrame('C:\\Projets\\CNA\\MatPlotLib_test\\test_MatPlotLib\\animation\\11_courbes.txt')
+    df = utils.csv_to_DataFrame('C:\\Projets\\CNA\\python-realtime-plotting\\test_MatPlotLib\\data\\11_courbes.txt')
     df_labels = list(df.iloc[0])
     df = df[1:].astype(float)
     
@@ -136,19 +137,19 @@ if __name__ == '__main__':
     step_time = start_time
     graph = Display()
     graph.set_labels(df_labels)
-    graph.display()
+    # graph.display()
 
     for line in range(1, df.shape[0]):
         graph.add_data(df.iloc[line])
-        # graph.display()
+        graph.display()
         # sleep(.01)
-    #     if not line % 1000:            
+        # if not line % 1000:
     #         print(f"Temps après \t{line}\tlignes:\t{time.time() - step_time:.2f} s")
     #         step_time = time.time()
     end_add_data = time.time()
-    # print(f"Durée du test: {end_add_data-start_time:.2f} s")
-    print(f"Durée ajout data: {end_add_data-start_time:.2f} s")
-    graph.display()
-    print(f"Temps affichage: {time.time()-end_add_data:.2f} s")
-    print(graph.df)
+    print(f"Durée du test: {end_add_data-start_time:.2f} s")
+    # print(f"Durée ajout data: {end_add_data-start_time:.2f} s")
+    # graph.display()
+    # print(f"Temps affichage: {time.time()-end_add_data:.2f} s")
+    # print(graph.df)
     sleep(10)

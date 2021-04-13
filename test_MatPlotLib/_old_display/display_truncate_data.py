@@ -5,18 +5,13 @@ import pandas as pd
 import time
 from sys import maxsize as int_max_value
 
-
-DISPLAY_DATA_LIMIT = 2000
-STORED_DATA_LIMIT = 10000
-DATA_TO_REMOVED = STORED_DATA_LIMIT - DISPLAY_DATA_LIMIT * 3
-
-
 class Display():
 
     def __init__(self):
         plt.ion()
 
         self.df = pd.DataFrame()
+        self.labels = ""
         self.y_min = int_max_value
         self.y_max = - int_max_value
 
@@ -27,26 +22,33 @@ class Display():
         self.ax.xaxis.set_major_locator(plt.MaxNLocator(6))
         self.ax.yaxis.set_major_locator(plt.MaxNLocator(10))
 
-        self.limit_data = DISPLAY_DATA_LIMIT
+        self.limit_data = 500
         self.range_min = 0
         self.range_max = 0
         self.time = time.time()
+        self.df_size = 0
 
         self.color_choice = []
 
     def set_labels(self, labels):
-        self.labels = list(labels)
-        self.df_size = len(labels)
+        # print('\nlabels: ', labels)
+        # self.df = pd.DataFrame(columns=labels)
+        # print('\ndf: ', self.df)
+        self.labels = labels
+        self.df_size = len(self.df.columns)
         self._assign_color_init(self.df_size)
         self.visible = [True] * self.df_size
         self._add_check_box()
 
     def add_data(self, data):
-        self.df = pd.concat([self.df, pd.DataFrame([data.values])], ignore_index=True)
+        if (len(data) == self.df_size) or (self.df_size == 0):
+            self.df = self.df.append([data.values], ignore_index=True)
+
+        # Limitation of amount of data saved
+        len_data = self.df.count()[0]
+        if len_data > self.limit_data * 2:
+            self.df = self.df[self.limit_data:]
         self.set_boundary()
-        index_min = self.df.index[0]
-        if self.range_max - index_min > STORED_DATA_LIMIT:
-            self.df = self.df.drop(range(index_min, index_min + DATA_TO_REMOVED))
 
     def display(self):
         time_now = time.time()
@@ -64,12 +66,17 @@ class Display():
         self.y_max = - int_max_value
 
         # Limitation of amount of data to plot
-        r_min = self.range_min = self.df.index[0]
-        r_max = self.range_max = self.df.index[-1]
-        if r_max - r_min > DISPLAY_DATA_LIMIT:
-            r_min = self.range_min = r_max - DISPLAY_DATA_LIMIT
+        len_data = self.df.count()[0]
+        if len_data > self.limit_data:
+            self.range_min = len_data - self.limit_data
+            self.range_max = len_data
+        else:
+            self.range_min = 1
+            self.range_max = len_data
 
         # y-axis range research
+        r_min = self.range_min
+        r_max = self.range_max
         for index in range(1, self.df_size):
             y_max = self.df[index][r_min:r_max].max()
             y_min = self.df[index][r_min:r_max].min()
@@ -81,9 +88,17 @@ class Display():
     def update_draw(self):
         r_min = self.range_min
         r_max = self.range_max
+        # x_label = self.df.columns[0]
+        # print('\nx_label: ', x_label)
+        # print('type(x_label): ', type(x_label))
+        # print('df.columns: ', self.df.columns)
+        # print('df: ', self.df)
+        print('self.range_max: ', self.range_max, '\ttype(self.range_max): ', type(self.range_max))
+        x_min = self.df[0].loc[0]
+        x_max = self.df[0].loc[self.range_max]
         self.ax.clear()
         self.ax.ignore_existing_data_limits = True
-        self.ax.update_datalim(((self.df[0][r_min], self.y_min),(self.df[0][r_max], self.y_max)))
+        self.ax.update_datalim(((x_min, self.y_min),(x_max, self.y_max)))
         self.ax.autoscale_view()
         # self.ax.set_xlim((r_min, r_max))
         # self.ax.set_ylim((self.y_min, self.y_max))
@@ -99,14 +114,13 @@ class Display():
 
     def _add_check_box(self):
         CheckButton = plt.axes([0.01, 0.01, 0.1, 0.9])
-        self.chxbox = CheckButtons(CheckButton, self.labels[1:], self.visible)    
-
+        # CheckButton = plt.axes([0.05, 0.4, 0.1, 0.15])
+        self.chxbox = CheckButtons(CheckButton, self.labels[1:], self.visible)
         [rec.set_facecolor(self.color_choice[i+1]) for i, rec in enumerate(self.chxbox.rectangles)] 
-        # [ll.set_linewidth(10) for l in self.chxbox.lines for ll in l]
         self.chxbox.on_clicked(self._set_visible)
 
     def _set_visible(self, label):
-        index = self.labels.index(label)
+        index = list(self.df.columns).index(label)
         self.visible[index] = not self.visible[index]
 
     def _assign_color_init(self, curves_number):
@@ -123,28 +137,16 @@ class Display():
 if __name__ == '__main__':
     import utils
     from time import sleep
-    import time
-    df = utils.csv_to_DataFrame('C:\\Projets\\CNA\\MatPlotLib_test\\test_MatPlotLib\\animation\\11_courbes.txt')
+    df = utils.csv_to_DataFrame('C:\\Projets\\CNA\\python-realtime-plotting\\test_MatPlotLib\\data\\6_courbes.txt')
     df_labels = list(df.iloc[0])
     df = df[1:].astype(float)
     
-    start_time = time.time()
-    step_time = start_time
     graph = Display()
     graph.set_labels(df_labels)
     graph.display()
 
     for line in range(1, df.shape[0]):
         graph.add_data(df.iloc[line])
-        # graph.display()
+        graph.display()
         # sleep(.01)
-        # if not line % 1000:            
-        #     print(f"Temps après \t{line}\tlignes:\t{time.time() - step_time:.2f} s")
-        #     step_time = time.time()
-    end_add_data = time.time()
-    # print(f"Durée du test: {end_add_data-start_time:.2f} s")
-    print(f"Durée ajout data: {end_add_data-start_time:.2f} s")
-    graph.display()
-    print(f"Temps affichage: {time.time()-end_add_data:.2f} s")
-    print(graph.df)
     sleep(10)

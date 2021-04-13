@@ -36,7 +36,22 @@ def test_pyplot():
     plt.show()
 
 def main():
-    pass
+    # test_pyplot()
+    # df = utils.csv_to_DataFrame()
+    df = utils.csv_to_DataFrame('C:\\Projets\\CNA\\python-realtime-plotting\\test_MatPlotLib\\data\\11_courbes.txt')
+    df_labels = list(df[0:1])
+    df = df[1:].astype(float)
+    
+    graph = display.Display()
+    graph.set_labels(df_labels)
+    graph.display()
+
+    for line in range(1, df.shape[0]):
+        graph.add_data(df.iloc[line])
+        graph.display()
+        sleep(.01)
+    print(df)
+    sleep(10)
 
 if __name__ == '__main__':
     main()
