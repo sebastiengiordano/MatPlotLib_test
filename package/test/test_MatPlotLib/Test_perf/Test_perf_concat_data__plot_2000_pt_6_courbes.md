@@ -1,0 +1,31 @@
+Temps après     1000    lignes: 4.25783371925354 s
+Temps après     2000    lignes: 3.984799385070801 s
+Temps après     3000    lignes: 3.333526134490967 s
+Temps après     4000    lignes: 2.3478426933288574 s
+Temps après     5000    lignes: 2.530941963195801 s
+Temps après     6000    lignes: 2.434520721435547 s
+Temps après     7000    lignes: 2.3656368255615234 s
+Temps après     8000    lignes: 2.379837989807129 s
+Temps après     9000    lignes: 2.3968403339385986 s
+Temps après     10000   lignes: 2.375645399093628 s
+Temps après     11000   lignes: 2.412175178527832 s
+Temps après     12000   lignes: 2.4218435287475586 s
+Temps après     13000   lignes: 2.4356164932250977 s
+Temps après     14000   lignes: 2.4449753761291504 s
+Temps après     15000   lignes: 2.4737048149108887 s
+Temps après     16000   lignes: 2.5537283420562744 s
+Temps après     17000   lignes: 2.4782583713531494 s
+Temps après     18000   lignes: 2.64575457572937 s
+Temps après     19000   lignes: 2.9211525917053223 s
+Temps après     20000   lignes: 2.9561874866485596 s
+Temps après     21000   lignes: 3.027473211288452 s
+Temps après     22000   lignes: 2.897214889526367 s
+Temps après     23000   lignes: 2.9169905185699463 s
+Temps après     24000   lignes: 2.9343831539154053 s
+Temps après     25000   lignes: 2.9584708213806152 s
+Temps après     26000   lignes: 2.9761199951171875 s
+Temps après     27000   lignes: 3.0155560970306396 s
+Temps après     28000   lignes: 3.05305814743042 s
+Temps après     29000   lignes: 3.1557869911193848 s
+Durée ajout data: 84.21866035461426 s
+Temps affichage: 0.14874649047851562 s
